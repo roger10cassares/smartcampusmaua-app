@@ -7,8 +7,6 @@ import { MapView } from '../../components/MapView';
 import axios from 'axios'; //Import of http library
 const baseURL = 'https://smartcampus.maua.br/node/gpslocation'; //dash SmartCampus
 import xmlbuilder from 'xmlbuilder';
-import { useScreenInfo } from '../../hooks/useScreenInfo';
-import { MapScreenContainer } from './styles';
 
 interface TrackpointProps {
   Time: string;
@@ -41,10 +39,6 @@ export const MapScreen = () => {
   const trackpoint = useRef([{}]); // Trackpoints 
   var RNFS = require('react-native-fs'); // File Creation
   const [post, setPost] = useState(null); //Axios HTTP Post
-
-  const screenInfo = useScreenInfo()
-  const orientation = useScreenInfo().isPortrait;
-  console.log(`ScreenInfo: ${JSON.stringify(screenInfo)}`)
 
 
   ////////////////////////////////// LOCATION ////////////////////////////////////
@@ -163,6 +157,10 @@ export const MapScreen = () => {
       return;
     }
 
+    if (Platform.OS === 'android' && foregroundService) {
+      await startForegroundService();
+    }
+
     setObserving(true);
 
     watchId.current = Geolocation.watchPosition(
@@ -193,13 +191,38 @@ export const MapScreen = () => {
     );
   };
 
+
+  const startForegroundService = async () => {
+    if (Platform.Version >= 26) {
+      await VIForegroundService.createNotificationChannel({
+        id: 'locationChannel',
+        name: 'Location Tracking Channel',
+        description: 'Tracks location of user',
+        enableVibration: false,
+      });
+    }
+
+    return VIForegroundService.startService({
+      channelId: 'locationChannel',
+      id: 420,
+      title: appConfig.displayName,
+      text: 'Tracking location updates',
+      icon: 'ic_launcher',
+    });
+  };
+
+  const stopForegroundService = useCallback(() => {
+    VIForegroundService.stopService().catch((err: any) => err);
+  }, []);
+
   const removeLocationUpdates = useCallback(() => {
     if (watchId.current !== null) {
+      stopForegroundService();
       Geolocation.clearWatch(watchId.current);
       watchId.current = null;
       setObserving(false);
     }
-  }, []);
+  }, [stopForegroundService]);
 
 
   useEffect(() => {
@@ -299,21 +322,87 @@ export const MapScreen = () => {
 
 
   return (
-    <View  style={styles.mainContainer}>
-    <MapScreenContainer isPortrait={orientation}>
+    <View style={styles.mainContainer}>
       <View style={styles.mapContainer}>
         <MapView
           coords={location?.coords || null}
         />
       </View>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <View>
+          <View style={styles.option}>
+            <Text>Enable High Accuracy</Text>
+            <Switch onValueChange={setHighAccuracy} value={highAccuracy} />
+          </View>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.contentContainerView}>
+          {Platform.OS === 'ios' && (
+            <View style={styles.option}>
+              <Text>Use Significant Changes</Text>
+              <Switch
+                onValueChange={setSignificantChanges}
+                value={significantChanges}
+              />
+            </View>
+          )}
+
+          {Platform.OS === 'android' && (
+            <>
+              <View style={styles.option}>
+                <Text>Show Location Dialog</Text>
+                <Switch
+                  onValueChange={setLocationDialog}
+                  value={locationDialog}
+                />
+              </View>
+              <View style={styles.option}>
+                <Text>Force Location Request</Text>
+                <Switch
+                  onValueChange={setForceLocation}
+                  value={forceLocation}
+                />
+              </View>
+              <View style={styles.option}>
+                <Text>Use Location Manager</Text>
+                <Switch
+                  onValueChange={setUseLocationManager}
+                  value={useLocationManager}
+                />
+              </View>
+              <View style={styles.option}>
+                <Text>Enable Foreground Service</Text>
+                <Switch
+                  onValueChange={setForegroundService}
+                  value={foregroundService}
+                />
+              </View>
+            </>
+          )}
+        </View>
+
+        <View style={styles.buttonContainer}>
           <Button title="Get Location" onPress={getLocation} />
-          <Button title="Start Observing" onPress={getLocationUpdates} disabled={observing} />
-          <Button title="Stop Observing" onPress={removeLocationUpdates} disabled={!observing} />
-          <Button title="HANDLE TRACKPOINT" onPress={handleTrackpoint} />
-          <Button title="WRITE TCX" onPress={writeTcx} />
+          <View style={styles.buttons}>
+            <Button
+              title="Start Observing"
+              onPress={getLocationUpdates}
+              disabled={observing}
+            />
+            <Button
+              title="Stop Observing"
+              onPress={removeLocationUpdates}
+              disabled={!observing}
+            />
+          </View>
+          <View style={styles.buttons}>
+            <Button title="HANDLE TRACKPOINT" onPress={handleTrackpoint} />
+          </View>
+          <View style={styles.buttons}>
+            <Button title="WRITE TCX" onPress={writeTcx} />
+          </View>
+        </View>
 
         <View style={styles.result}>
           <Text>Latitude: {location?.coords?.latitude || ''}</Text>
@@ -330,10 +419,9 @@ export const MapScreen = () => {
               ? new Date(location.timestamp).toLocaleString()
               : ''}
           </Text>
-          </View>
-          </View>
-          </View>
-    </MapScreenContainer>
+        </View>
+
+      </ScrollView>
     </View>
   );
 };
@@ -341,19 +429,17 @@ export const MapScreen = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    // flexDirection: "row",
-    // flexWrap: "wrap",
-    // alignContent: "stretch"
   },
   mapContainer: {
-    flex: 0.75,
+    flex: 1,
+    backgroundColor: '#F5FCFF',
+  },
+  scrollContainer: {
+    flex: 0.5,
     backgroundColor: '#F5FCFF',
   },
   contentContainer: {
-    flex: 0.25,
-  },
-  contentContainerView: {
-    flex: 1
+    padding: 12,
   },
   option: {
     flexDirection: 'row',
@@ -362,7 +448,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   result: {
-    flex: 1,
     borderWidth: 1,
     borderColor: '#777',
     width: '100%',

@@ -3,15 +3,13 @@ import { Animated,Button,Dimensions, StyleSheet, Text, View } from "react-native
 import * as BootSplash from "react-native-bootsplash";
 import { NavigationContainer } from "@react-navigation/native";
 import { MainScreen } from './MainScreen';
-import bootSplashLogo from "../assets/images/BootSplashLogo/SmartCampusMauaLogo_512x512.png";
+import bootSplashLogo from "../assets/images/BootSplashLogo/SmartCampusMauaLogo_1024x1024.png";
 import { RootStack } from "../navigation/RootStackNavigator";
 import { RootScreen } from "./RootScreen"
 
 const fakeApiCallWithoutBadNetwork = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-// import { RootStack } from '../navigation/RootStackNavigator'
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 export const App = () => {
   const [bootSplashIsVisible, setBootSplashIsVisible] = useState(true);
@@ -107,30 +105,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   logo: {
-    height: 300,
-    width: 300,
+    height: 100,
+    width: 100,
   },
 });
 
-
-
-
-
-// type MainScreenProps = {
-//   navigation: any;
-// }
-// function MainScreen({ navigation }: MainScreenProps) {
-//   console.log('Entered in Main Screen')
-//   return (
-//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-//       <Text>Main Screen</Text>
-//       <Button
-//         title="Go to Root"
-//         onPress={() => navigation.navigate('Root')}
-//       />
-//     </View>
-//   );
-// }
 
 
 type LoginScreenProps = {

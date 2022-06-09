@@ -5,13 +5,13 @@ import { HomeStack } from '../../navigation/HomeStackNavigator'
 
 export const HomeScreen = () => {
   return (
-    <HomeStack>
+    // <HomeStack>
       <SafeAreaView style={styles.container}>
           <WebView
             source={{ uri: 'https://smartcampus.maua.br' }}
           />
       </SafeAreaView>
-    </HomeStack>
+    // </HomeStack>
   );
 }
 

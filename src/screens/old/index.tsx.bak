@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated,Dimensions, StyleSheet, Text, View } from "react-native";
+import { Animated,Button,Dimensions, StyleSheet, Text, View } from "react-native";
 import * as BootSplash from "react-native-bootsplash";
 import { NavigationContainer } from "@react-navigation/native";
-import { MainScreen, ProfileScreen } from '../MainScreen';
-import bootSplashLogo from "../../assets/images/BootSplashLogo/SmartCampusMauaLogo_512x512.png";
-
+import { MainScreen } from './MainScreen';
+import bootSplashLogo from "../assets/images/BootSplashLogo/SmartCampusMauaLogo_512x512.png";
+import { RootStack } from "../navigation/RootStackNavigator";
+import { RootScreen } from "./RootScreen"
 
 const fakeApiCallWithoutBadNetwork = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-import { RootStack } from '../../navigation/RootStackNavigator'
 
-export const RootScreen = () => {
+export const App = () => {
   const [bootSplashIsVisible, setBootSplashIsVisible] = useState(true);
   const [bootSplashLogoIsLoaded, setBootSplashLogoIsLoaded] = useState(false);
   const opacity = useRef(new Animated.Value(1));
@@ -56,26 +56,14 @@ export const RootScreen = () => {
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {isLoggedIn ? (
-          // Screens for logged in users
-          <RootStack.Group>
-            <RootStack.Screen name="App" component={AppScreen} />
-          </RootStack.Group>
-        ) : (
-          // Auth screens
-          <RootStack.Group screenOptions={{ headerShown: false }}>
-            <RootStack.Screen name="SignIn" component={SignInScreen} />
-            <RootStack.Screen name="SignUp" component={SignUpScreen} />
-          </RootStack.Group>
-        )}
-        {/* Common modal screens */}
-        <RootStack.Group screenOptions={{ presentation: 'modal' }}>
-          <RootStack.Screen name="Help" component={HelpModal} />
-          <RootStack.Screen name="Invite" component={InviteModal} />
-        </RootStack.Group>
+      <RootStack.Navigator initialRouteName="Root">
+        <RootStack.Screen name="Root" component={RootScreen} />
+        <RootStack.Screen name="Main" component={MainScreen} />
+        <RootStack.Screen name="Login" component={LoginScreen} />
+        <RootStack.Screen name="SignUp" component={SignUpScreen} />
+        <RootStack.Screen name="SocialLogin" component={SocialLoginScreen} />
+        <RootStack.Screen name="PublicLogin" component={PublicLoginScreen} />
       </RootStack.Navigator>
-
 
       {bootSplashIsVisible && (
         <Animated.View
@@ -97,46 +85,10 @@ export const RootScreen = () => {
           />
         </Animated.View>
       )}
+
     </NavigationContainer>
   );
-};
-
-
-
-
-// const SignInScreen = () => {
-//   return (
-//     <View>
-//       <Text>SignIn</Text>
-//     </View>
-//   )
-// }
-
-const SignUpScreen = () => {
-  return (
-    <View>
-      <Text>SignUp</Text>
-    </View>
-  )
 }
-
-const HelpModal = () => {
-  return (
-    <View>
-      <Text>Help</Text>
-    </View>
-  )
-}
-
-const InviteModal = () => {
-  return (
-    <View>
-      <Text>Invite</Text>
-    </View>
-  )
-}
-
-
 
 
 const styles = StyleSheet.create({
@@ -162,52 +114,83 @@ const styles = StyleSheet.create({
 
 
 
+// type MainScreenProps = {
+//   navigation: any;
+// }
+// function MainScreen({ navigation }: MainScreenProps) {
+//   console.log('Entered in Main Screen')
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//       <Text>Main Screen</Text>
+//       <Button
+//         title="Go to Root"
+//         onPress={() => navigation.navigate('Root')}
+//       />
+//     </View>
+//   );
+// }
 
 
-type AppScreenProps = {
-  navigation: any
+type LoginScreenProps = {
+  navigation: any;
 }
-
-function AppScreen({ navigation }: AppScreenProps) {
+function LoginScreen({ navigation }: LoginScreenProps) {
+  console.log('Entered in Login Screen')
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Home Screen</Text>
+      <Text>Login Screen</Text>
       <Button
-        title="Go to Details"
-        onPress={() => {
-          /* 1. Navigate to the Details route with params */
-          navigation.navigate('Details', {
-            itemId: 86,
-            otherParam: 'anything you want here',
-          });
-        }}
+        title="Go to Root"
+        onPress={() => navigation.navigate('Root')}
       />
     </View>
   );
 }
 
-type LoginScreenProps = {
-  route: any;
+type SignUpScreenProps = {
   navigation: any;
 }
-function SignInScreen({ route, navigation }: LoginScreenProps) {
-  /* 2. Get the param */
-  const { itemId, otherParam } = route.params;
+function SignUpScreen({ navigation }: SignUpScreenProps) {
+  console.log('Entered in SignUp Screen')
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Details Screen</Text>
-      <Text>itemId: {JSON.stringify(itemId)}</Text>
-      <Text>otherParam: {JSON.stringify(otherParam)}</Text>
+      <Text>SignUp Screen</Text>
       <Button
-        title="Go to Details... again"
-        onPress={() =>
-          navigation.push('Details', {
-            itemId: Math.floor(Math.random() * 100),
-          })
-        }
+        title="Go to Root"
+        onPress={() => navigation.navigate('Root')}
       />
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
-      <Button title="Go back" onPress={() => navigation.goBack()} />
+    </View>
+  );
+}
+
+type SocialLoginProps = {
+  navigation: any;
+}
+function SocialLoginScreen({ navigation }: SocialLoginProps) {
+  console.log('Entered in SocialLogin')
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Social Login</Text>
+      <Button
+        title="Go to Root"
+        onPress={() => navigation.navigate('Root')}
+      />
+    </View>
+  );
+}
+
+type PublicLoginProps = {
+  navigation: any;
+}
+function PublicLoginScreen({ navigation }: PublicLoginProps) {
+  console.log('Entered in PublicLogin')
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Public Login</Text>
+      <Button
+        title="Go to Root"
+        onPress={() => navigation.navigate('Root')}
+      />
     </View>
   );
 }

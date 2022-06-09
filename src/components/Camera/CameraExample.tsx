@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Camera from './Camera';
 import { CameraType } from './CameraScreen';
 
-export default class CameraExample extends Component {
-    camera: any;
-  render() {
+export const CameraExample = () => {
+  const camera = useRef()
     return (
       <View style={styles.cameraContainer}>
         <Camera
-          ref={this.camera}
+          ref={camera}
           style={{flex: 1}}
           cameraType={CameraType.Back} // optional
           flashMode="auto" // on/off/auto(default)
@@ -30,7 +29,6 @@ export default class CameraExample extends Component {
         />
       </View>
     );
-  }
 }
 
 const styles = StyleSheet.create(

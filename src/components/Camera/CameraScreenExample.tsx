@@ -11,8 +11,8 @@ import torchOn from "../../assets/images/CameraIcons/torchOn.png";
 import torchOff from "../../assets/images/CameraIcons/torchOff.png";
 
 
-export default class CameraScreenExample extends Component {
-  onBottomButtonPressed(event: any) {
+export const CameraScreenExample = () => {
+    const onBottomButtonPressed = (event: any) => {
     const captureImages = JSON.stringify(event.captureImages);
     Alert.alert(
       `"${event.type}" Button Pressed`,
@@ -22,11 +22,11 @@ export default class CameraScreenExample extends Component {
     );
   }
 
-  render() {
     return (
       <CameraScreen
-            actions={{ rightButtonText: 'Done', leftButtonText: 'Cancel' }}
-            onBottomButtonPressed={(event) => this.onBottomButtonPressed(event)}
+        // actions={{ rightButtonText: 'Done', leftButtonText: 'Cancel' }}
+        actions={{ rightButtonText: 'Done' }}
+        onBottomButtonPressed={(event) => onBottomButtonPressed(event)}
             flashImages={{
                 on: flashOn,
                 off: flashOff,
@@ -40,5 +40,4 @@ export default class CameraScreenExample extends Component {
                 throw new Error('Function not implemented.');
             } }      />
     );
-  }
 }
